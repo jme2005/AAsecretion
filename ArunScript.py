@@ -14,7 +14,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 
 
-os.chdir("/Users/jme2005/coursera/Arun")
+os.chdir("/Users/johanedvinsson/projects/Arun")
 from scipy.stats import cumfreq
 
 def ecdfSyt(df,Group,Conc,threshold):
@@ -133,8 +133,10 @@ def solveequation(params,times,Cai):
     return output
 
 def CostFunction(params):
-    target=digitsyt1['target'].values
-    model = solveequation(params,digitsyt1['time'],1e-9)
+    if any( x < 0 for x in params):
+        return 100
+    target=digitsyt7['target'].values
+    model = solveequation(params,digitsyt7['time'],1e-9)
     RMSE = np.sqrt((target-model)**2)
     return RMSE.mean()
 
@@ -143,7 +145,7 @@ def sampleInit(n):
     fitvalue=[]
     for i in n:
         np.random.seed(i)
-        x = np.random.uniform(-10,10,13)
+        x = np.random.uniform(-3,3,13)
         params = 10**x
         
         fit = minimize(CostFunction,params)
@@ -154,7 +156,7 @@ def sampleInit(n):
 
     return output
 
-
+# seed 2 work well
 
 def main():
     digit = pd.read_csv('latencies.csv')
@@ -170,7 +172,7 @@ def main():
     digitsyt7 = createDF(digitsyt7,'Syt-7',[5,10,30,100],0.08)
     DR = pd.read_csv('DigitoninDR.csv')
     tmp=DR[['Conc','Syt1']]
-    tmp.columns=['Conc','Dose']
+    tmp.columns=['Conc','Dose']  
     digitsyt1 = pd.merge(digitsyt1,tmp, how='inner')
     tmp=DR[['Conc','Syt7']]
     tmp.columns=['Conc','Dose']
